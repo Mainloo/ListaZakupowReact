@@ -1,6 +1,3 @@
-# Ignore frontend directory - it has its own git repository
-frontend/
-
 # Node modules
 node_modules/
 
