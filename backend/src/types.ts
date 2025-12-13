@@ -4,6 +4,7 @@ export interface Product {
     category: string;
     price?: number;
 }
+
 export interface ShoppingList {
     id: number;
     name: string;
@@ -16,5 +17,5 @@ export interface ShoppingList {
 export interface NewListForm {
     name: string;
     date: string;
-    notes: string;
+    notes?: string;
 }

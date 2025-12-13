@@ -5,6 +5,7 @@ import { ShoppingList, NewListForm } from './types';
 import { fetchLists, createList } from './api/listsApi';
 import { ListForm } from './components/ListForm';
 import { ListItem } from './components/ListItem';
+import { ProductsPage } from './pages/ProductsPage';
 
 function App() {
   const [lists, setLists] = useState<ShoppingList[]>([]);
@@ -33,17 +34,26 @@ function App() {
 
   return (
     <div className="App">
-      <h1>🛒 Planer Zakupów (Modularny)</h1>
+      <h1>Planer Zakupów</h1>
       
       {globalError && <p className="error" style={{textAlign:'center'}}>{globalError}</p>}
+      
+      <section style={{ borderBottom: '3px solid #ddd', paddingBottom: '30px' }}>
+        <ProductsPage />
+      </section>
+
+     <section style={{ marginTop: '30px' }}>
+      <h2>Listy zakupów</h2>
+
       <ListForm onAdd={handleAddList} />
 
       <div>
         <h3>Twoje Listy:</h3>
-        {lists.map((list) => (
+        {lists.map(list => (
           <ListItem key={list.id} list={list} />
         ))}
       </div>
+    </section>
     </div>
   );
 }
