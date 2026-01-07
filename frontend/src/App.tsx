@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-import { ShoppingList, NewListForm } from './types';
-import { fetchLists, createList } from './api/listsApi';
+import { ShoppingList, NewListForm, Product } from './types';
+import { fetchLists, createList, addProductToList, toggleProductStatus } from './api/listsApi'; 
+import { getProducts } from './api/productsApi';
+
 import { ListForm } from './components/ListForm';
 import { ListItem } from './components/ListItem';
 import { ProductsPage } from './pages/ProductsPage';
 
 function App() {
   const [lists, setLists] = useState<ShoppingList[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [globalError, setGlobalError] = useState<string>('');
-
 
   useEffect(() => {
     loadData();
@@ -18,42 +20,73 @@ function App() {
 
   const loadData = async () => {
     try {
-      const data = await fetchLists();
-      setLists(data);
+      const [listsData, productsData] = await Promise.all([
+        fetchLists(),
+        getProducts()
+      ]);
+      setLists(listsData);
+      setAllProducts(productsData);
     } catch (err) {
-      setGlobalError('Nie udało się pobrać list z serwera.');
+      setGlobalError('Nie udało się pobrać danych.');
     }
   };
 
+  const refreshProducts = async () => {
+      const data = await getProducts();
+      setAllProducts(data);
+  };
+
   const handleAddList = async (formData: NewListForm) => {
-    // API call
     const newList = await createList(formData);
-    // Aktualizacja stanu
     setLists(prev => [...prev, newList]);
+  };
+
+  const handleAddProductToList = async (listId: number, productId: number, quantity: number) => {
+      try {
+          const updatedList = await addProductToList(listId, productId, quantity);
+          setLists(prev => prev.map(l => l.id === listId ? updatedList : l));
+      } catch (err) {
+          alert('Błąd dodawania produktu');
+      }
+  };
+
+  const handleToggleProduct = async (listId: number, productId: number) => {
+      try {
+        
+          const updatedList = await toggleProductStatus(listId, productId);
+          setLists(prev => prev.map(l => l.id === listId ? updatedList : l));
+      } catch (err) {
+          console.error(err);
+      }
   };
 
   return (
     <div className="App">
       <h1>Planer Zakupów</h1>
-      
-      {globalError && <p className="error" style={{textAlign:'center'}}>{globalError}</p>}
+      {globalError && <p className="error">{globalError}</p>}
       
       <section style={{ borderBottom: '3px solid #ddd', paddingBottom: '30px' }}>
+        <button onClick={refreshProducts}>Odśwież bazę produktów</button>
         <ProductsPage />
       </section>
 
-     <section style={{ marginTop: '30px' }}>
-      <h2>Listy zakupów</h2>
+      <section style={{ marginTop: '30px' }}>
+        <h2>Listy zakupów</h2>
+        <ListForm onAdd={handleAddList} />
 
-      <ListForm onAdd={handleAddList} />
-
-      <div>
-        <h3>Twoje Listy:</h3>
-        {lists.map(list => (
-          <ListItem key={list.id} list={list} />
-        ))}
-      </div>
-    </section>
+        <div>
+          <h3>Twoje Listy:</h3>
+          {lists.map(list => (
+            <ListItem 
+                key={list.id} 
+                list={list}
+                availableProducts={allProducts}
+                onAddProduct={handleAddProductToList}
+                onToggleProduct={handleToggleProduct}
+            />
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

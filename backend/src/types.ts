@@ -5,13 +5,18 @@ export interface Product {
     price?: number;
 }
 
+export interface ShoppingListItem extends Product {
+    quantity: number;
+    isBought: boolean;
+}
+
 export interface ShoppingList {
     id: number;
     name: string;
     date: string;
     notes: string;
     createdAt: string;
-    products: Product[];
+    products: ShoppingListItem[]; 
 }
 
 export interface NewListForm {

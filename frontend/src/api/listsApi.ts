@@ -23,7 +23,28 @@ export const createList = async (newList: NewListForm): Promise<ShoppingList> =>
     }
     return res.json();
 };
-// usuwanie
+
 export const removeList = async (id: number): Promise<void> => {
     await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+};
+
+
+export const addProductToList = async (listId: number, productId: number, quantity: number): Promise<ShoppingList> => {
+    const res = await fetch(`${API_URL}/${listId}/products`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId, quantity }) 
+    });
+
+    if (!res.ok) throw new Error('Nie udało się dodać produktu');
+    return res.json();
+};
+
+export const toggleProductStatus = async (listId: number, productId: number): Promise<ShoppingList> => {
+    const res = await fetch(`${API_URL}/${listId}/products/${productId}/toggle`, {
+        method: 'PATCH',
+    });
+
+    if (!res.ok) throw new Error('Nie udało się zmienić statusu');
+    return res.json();
 };

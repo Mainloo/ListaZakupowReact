@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { lists } from '../data/lists';
+import { products } from '../data/products';
 import { ShoppingList } from '../types';
 
 export const getLists = (req: Request, res: Response) => {
@@ -37,4 +38,40 @@ export const deleteList = (req: Request, res: Response) => {
 
     lists.splice(index, 1);
     res.sendStatus(204);
+};
+
+export const addProductToList = (req: Request, res: Response) => {
+    const listId = Number(req.params.id);
+    const { productId, quantity } = req.body; 
+
+    const list = lists.find(l => l.id === listId);
+    if (!list) return res.status(404).json({ error: 'Nie znaleziono listy' });
+
+    const productInDb = products.find(p => p.id === Number(productId));
+    if (!productInDb) return res.status(404).json({ error: 'Nie znaleziono produktu' });
+
+
+    const newItem = {
+        ...productInDb,
+        quantity: quantity || 1, 
+        isBought: false          
+    };
+
+    list.products.push(newItem);
+    res.status(200).json(list);
+};
+
+export const toggleProductInList = (req: Request, res: Response) => {
+    const listId = Number(req.params.id);
+    const productId = Number(req.params.productId); 
+
+    const list = lists.find(l => l.id === listId);
+    if (!list) return res.status(404).json({ error: 'Nie znaleziono listy' });
+
+    const item = list.products.find(p => p.id === productId);
+    if (!item) return res.status(404).json({ error: 'Produkt nie jest na tej liście' });
+
+    item.isBought = !item.isBought;
+
+    res.json(list);
 };

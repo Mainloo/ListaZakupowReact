@@ -18,7 +18,6 @@ export const ListForm: React.FC<Props> = ({ onAdd }) => {
         e.preventDefault();
         setError('');
 
-        // Walidacja lokalna
         if (formData.name.length < 3) {
             setError("Nazwa za krótka (min 3 znaki)");
             return;
