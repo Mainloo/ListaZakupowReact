@@ -49,15 +49,21 @@ export const addProductToList = (req: Request, res: Response) => {
 
     const productInDb = products.find(p => p.id === Number(productId));
     if (!productInDb) return res.status(404).json({ error: 'Nie znaleziono produktu' });
+    const existingItem = list.products.find(p => p.id === Number(productId));
 
+    if (existingItem) {
+        // SCENARIUSZ A: Produkt jest
+        existingItem.quantity += (quantity || 1);
+    } else {
+        // SCENARIUSZ B: Produktu nie ma
+        const newItem = {
+            ...productInDb,
+            quantity: quantity || 1, 
+            isBought: false          
+        };
+        list.products.push(newItem);
+    }
 
-    const newItem = {
-        ...productInDb,
-        quantity: quantity || 1, 
-        isBought: false          
-    };
-
-    list.products.push(newItem);
     res.status(200).json(list);
 };
 
@@ -75,3 +81,19 @@ export const toggleProductInList = (req: Request, res: Response) => {
 
     res.json(list);
 };
+
+export const removeProductFromList = (req: Request, res: Response) => {
+    const listId = Number(req.params.id);
+    const productId = Number(req.params.productId);
+    const list = lists.find(l => l.id === listId);
+    if (!list) {
+        return res.status(404).json({ error: 'Nie znaleziono listy' });
+    }
+    const productIndex = list.products.findIndex(p => p.id === productId);
+    
+    if (productIndex === -1) {
+        return res.status(404).json({ error: 'Tego produktu nie ma na liście' });
+    }
+    list.products.splice(productIndex, 1);
+    res.sendStatus(204);
+}

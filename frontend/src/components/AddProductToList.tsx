@@ -20,11 +20,11 @@ export const AddProductToList: React.FC<Props> = ({ availableProducts, onAdd }) 
     };
 
     return (
-        <form onSubmit={handleSubmit} style={{ marginTop: '10px', display: 'flex', gap: '5px', alignItems: 'center' }}>
+        <form className="add-product-form" onSubmit={handleSubmit}>
             <select 
+                className="product-select"
                 value={selectedId} 
                 onChange={(e) => setSelectedId(e.target.value)}
-                style={{ padding: '5px' }}
             >
                 <option value="">-- Wybierz produkt --</option>
                 {availableProducts.map(p => (
@@ -34,13 +34,12 @@ export const AddProductToList: React.FC<Props> = ({ availableProducts, onAdd }) 
                 ))}
             </select>
             
-            {/* Pole ilości */}
             <input 
+                className="quantity-input"
                 type="number" 
                 min="1" 
                 value={quantity} 
                 onChange={e => setQuantity(Number(e.target.value))}
-                style={{ width: '50px', padding: '5px' }}
             />
 
             <button type="submit" disabled={!selectedId}>Dodaj</button>

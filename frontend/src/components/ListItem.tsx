@@ -4,59 +4,72 @@ import { AddProductToList } from './AddProductToList';
 
 interface Props {
     list: ShoppingList;
-    availableProducts: Product[]; 
+    availableProducts: Product[];
     onAddProduct: (listId: number, productId: number, quantity: number) => void;
-    onToggleProduct: (listId: number, productId: number) => void; // Nowy prop
+    onToggleProduct: (listId: number, productId: number) => void;
+    onRemove: (id: number) => void;
+    onRemoveProduct: (listId: number, productId: number) => void;
 }
 
-export const ListItem: React.FC<Props> = ({ list, availableProducts, onAddProduct, onToggleProduct }) => {
+export const ListItem: React.FC<Props> = ({ 
+    list, 
+    availableProducts, 
+    onAddProduct, 
+    onToggleProduct, 
+    onRemove,
+    onRemoveProduct
+}) => {
     return (
-        <div className="list-item" style={{ border: '1px solid #ddd', padding: '15px', margin: '10px 0', borderRadius: '5px', background: '#fff' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ margin: 0 }}>{list.name}</h3>
-                <small>{list.date}</small>
+        <div className="list-card">
+            <div className="list-header">
+                <h3>{list.name} <span className="date">({list.date})</span></h3>
+                <button onClick={() => onRemove(list.id)}>Usuń listę</button>
             </div>
-            <p style={{ fontStyle: 'italic', color: '#666' }}>{list.notes}</p>
-
-            <hr style={{ margin: '10px 0', borderTop: '1px solid #eee' }} />
             
-            <strong>Do kupienia:</strong>
-            {list.products && list.products.length > 0 ? (
-                <ul style={{ listStyle: 'none', padding: 0 }}>
-                    {list.products.map((p, index) => (
-                        <li key={`${list.id}-${p.id}-${index}`} 
-                            style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                padding: '5px 0',
-                                textDecoration: p.isBought ? 'line-through' : 'none', 
-                                color: p.isBought ? '#aaa' : '#000' 
-                            }}>
-                            
-                            {/* Checkbox */}
+            {list.notes && <p className="notes">{list.notes}</p>}
+
+            <ul className="shopping-items">
+                {list.products.map((p, idx) => (
+                    <li 
+                        key={`${p.id}-${idx}`} 
+                        style={{ 
+                            textDecoration: p.isBought ? 'line-through' : 'none',
+                            color: p.isBought ? '#aaa' : 'inherit',
+                            padding: '5px 0', 
+                            display: 'flex', 
+                            justifyContent: 'center',
+                            alignItems: 'center',    
+                            gap: '10px'               
+                        }}
+                    >
+                        <div>
                             <input 
                                 type="checkbox" 
                                 checked={p.isBought} 
                                 onChange={() => onToggleProduct(list.id, p.id)}
-                                style={{ marginRight: '10px', cursor: 'pointer' }}
+                                style={{ marginRight: '10px' }}
                             />
+                            {p.name} (x{p.quantity}) - {p.category}
                             
-                            <span>
-                                <b>{p.name}</b> x{p.quantity} 
-                                <span style={{ fontSize: '0.8em', marginLeft: '5px' }}>
-                                    ({p.category}) {p.price ? `${(p.price * p.quantity).toFixed(2)} zł` : ''}
+                            {p.price && (
+                                <span style={{ fontWeight: 'bold', marginLeft: '5px' }}>
+                                    | {(p.price * p.quantity).toFixed(2)} zł
                                 </span>
-                            </span>
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <p style={{ fontSize: '0.9em', color: '#888' }}>Lista pusta.</p>
-            )}
+                            )}
+                        </div>
+
+                        <button 
+                            onClick={() => onRemoveProduct(list.id, p.id)}
+                            style={{ marginLeft: '10px', color: 'red', cursor: 'pointer' }}
+                        >X</button>
+                    </li>
+                ))}
+                {list.products.length === 0 && <li><i>Brak produktów na liście</i></li>}
+            </ul>
 
             <AddProductToList 
                 availableProducts={availableProducts} 
-                onAdd={(productId, quantity) => onAddProduct(list.id, productId, quantity)} 
+                onAdd={(pid, qty) => onAddProduct(list.id, pid, qty)} 
             />
         </div>
     );

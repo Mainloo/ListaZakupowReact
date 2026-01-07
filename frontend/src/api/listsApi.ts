@@ -1,50 +1,40 @@
+import api from './axios';
 import { ShoppingList, NewListForm } from '../types';
 
-const API_URL = 'http://localhost:5000/api/lists';
-
 export const fetchLists = async (): Promise<ShoppingList[]> => {
-    const res = await fetch(API_URL);
-    if (!res.ok) {
-        throw new Error('Błąd podczas pobierania list');
-    }
-    return res.json();
+    const response = await api.get('/lists');
+    return response.data;
 };
 
 export const createList = async (newList: NewListForm): Promise<ShoppingList> => {
-    const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newList)
-    });
-
-    if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || 'Błąd serwera');
-    }
-    return res.json();
+    const response = await api.post('/lists', newList);
+    return response.data;
 };
 
 export const removeList = async (id: number): Promise<void> => {
-    await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    await api.delete(`/lists/${id}`);
 };
 
-
-export const addProductToList = async (listId: number, productId: number, quantity: number): Promise<ShoppingList> => {
-    const res = await fetch(`${API_URL}/${listId}/products`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId, quantity }) 
+export const addProductToList = async (
+    listId: number, 
+    productId: number, 
+    quantity: number
+): Promise<ShoppingList> => {
+    const response = await api.post(`/lists/${listId}/products`, { 
+        productId, 
+        quantity 
     });
-
-    if (!res.ok) throw new Error('Nie udało się dodać produktu');
-    return res.json();
+    return response.data;
 };
 
-export const toggleProductStatus = async (listId: number, productId: number): Promise<ShoppingList> => {
-    const res = await fetch(`${API_URL}/${listId}/products/${productId}/toggle`, {
-        method: 'PATCH',
-    });
+export const toggleProductStatus = async (
+    listId: number, 
+    productId: number
+): Promise<ShoppingList> => {
+    const response = await api.patch(`/lists/${listId}/products/${productId}/toggle`);
+    return response.data;
+};
 
-    if (!res.ok) throw new Error('Nie udało się zmienić statusu');
-    return res.json();
+export const removeProductFromList = async (listId: number, productId: number): Promise<void> => {
+    await api.delete(`/lists/${listId}/products/${productId}`);
 };
