@@ -1,7 +1,6 @@
 import React from 'react';
 import './App.css';
 
-// Importujemy nasze dwie główne strony
 import { ProductsPage } from './pages/ProductsPage';
 import { ListsPage } from './pages/ListsPage';
 
