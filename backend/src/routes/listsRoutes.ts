@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import { getLists, addList, deleteList, addProductToList, toggleProductInList, removeProductFromList } from '../controllers/listsController';
+import { getLists, addList, updateList, deleteList, addProductToList, toggleProductInList, removeProductFromList } from '../controllers/listsController';
 
 const router = Router();
 
 router.get('/', getLists);
 router.post('/', addList);
+router.put('/:id', updateList);
 router.delete('/:id', deleteList);
 router.post('/:id/products', addProductToList);
 router.patch('/:id/products/:productId/toggle', toggleProductInList);

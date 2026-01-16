@@ -1,6 +1,8 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { NewListForm } from '../types'; 
 
+import { Button } from './common/Button';
+
 interface Props {
     onAdd: (data: NewListForm) => Promise<void>;
 }
@@ -32,30 +34,36 @@ export const ListForm: React.FC<Props> = ({ onAdd }) => {
     };
 
     return (
-        <div style={{ borderBottom: '2px solid #ccc', paddingBottom: '20px' }}>
+        <div className="form-card">
             <h3>Dodaj nową listę</h3>
             {error && <p className="error">{error}</p>}
             
             <form onSubmit={handleSubmit}>
-                <input 
-                    name="name" 
-                    value={formData.name} 
-                    onChange={handleChange} 
-                    placeholder="Nazwa listy" 
-                />
-                <input 
-                    name="date" 
-                    type="date" 
-                    value={formData.date} 
-                    onChange={handleChange} 
-                />
-                <input 
-                    name="notes" 
-                    value={formData.notes} 
-                    onChange={handleChange} 
-                    placeholder="Notatki" 
-                />
-                <button type="submit">Utwórz</button>
+                <div className="form-row">
+                    <input 
+                        name="name" 
+                        value={formData.name} 
+                        onChange={handleChange} 
+                        placeholder="Nazwa listy"
+                        style={{ flex: 2 }} 
+                    />
+                    <input 
+                        name="date" 
+                        type="date" 
+                        value={formData.date} 
+                        onChange={handleChange} 
+                    />
+                </div>
+                <div className="form-row">
+                    <input 
+                        name="notes" 
+                        value={formData.notes} 
+                        onChange={handleChange} 
+                        placeholder="Notatki (opcjonalnie)" 
+                        style={{ flex: 1 }}
+                    />
+                </div>
+                <Button type="submit">Utwórz</Button>
             </form>
         </div>
     );

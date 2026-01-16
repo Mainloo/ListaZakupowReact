@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
 import { Product } from '../types';
+import { Button } from './common/Button';
+import { useState } from 'react';
 
 interface Props {
     availableProducts: Product[];
@@ -42,7 +43,7 @@ export const AddProductToList: React.FC<Props> = ({ availableProducts, onAdd }) 
                 onChange={e => setQuantity(Number(e.target.value))}
             />
 
-            <button type="submit" disabled={!selectedId}>Dodaj</button>
+            <Button type="submit" disabled={!selectedId}>Dodaj</Button>
         </form>
     );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ShoppingList, NewListForm, Product } from '../types';
 import { 
   fetchLists, 
@@ -17,15 +17,13 @@ export const ListsPage: React.FC = () => {
   const [lists, setLists] = useState<ShoppingList[]>([]);
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const [error, setError] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('date');
+  const [order, setOrder] = useState<string>('desc');
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       const [listsData, productsData] = await Promise.all([
-        fetchLists(),
+        fetchLists(sortBy, order),
         getProducts()
       ]);
       setLists(listsData);
@@ -33,12 +31,16 @@ export const ListsPage: React.FC = () => {
     } catch (err) {
       setError('Nie udało się pobrać danych list zakupów.');
     }
-  };
+  }, [sortBy, order]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleAddList = async (formData: NewListForm) => {
     try {
-      const newList = await createList(formData);
-      setLists(prev => [...prev, newList]);
+      await createList(formData);
+      loadData();
       setError('');
     } catch (err) {
       setError('Błąd podczas tworzenia listy');
@@ -105,8 +107,21 @@ export const ListsPage: React.FC = () => {
 
       <ListForm onAdd={handleAddList} />
 
-      <div style={{ marginTop: '20px' }}>
-        <h3>Twoje Listy:</h3>
+      <div style={{ marginTop: '30px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+            <h3 style={{ margin: 0 }}>Twoje Listy:</h3>
+            <div className="sort-controls">
+                <label>Sortuj wg: </label>
+                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                    <option value="date">Daty</option>
+                    <option value="name">Nazwy</option>
+                </select>
+                <select value={order} onChange={(e) => setOrder(e.target.value)} style={{ marginLeft: '10px' }}>
+                    <option value="asc">Rosnąco</option>
+                    <option value="desc">Malejąco</option>
+                </select>
+            </div>
+        </div>
         {lists.map(list => (
           <ListItem
             key={list.id}

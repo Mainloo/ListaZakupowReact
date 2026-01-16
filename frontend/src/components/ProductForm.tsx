@@ -1,5 +1,6 @@
 import React, { useState, FormEvent, useEffect } from 'react';
 import { Product } from '../types';
+import { Button } from './common/Button';
 
 interface Props {
     onAdd: (data: Omit<Product, 'id'>) => Promise<void>;
@@ -69,37 +70,43 @@ export const ProductForm: React.FC<Props> = ({ onAdd, onUpdate, editingProduct, 
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <div className="form-card">
             <h3>{editingProduct ? 'Edytuj produkt' : 'Dodaj produkt'}</h3>
 
             {error && <p className="error">{error}</p>}
 
-            <div>
-                <input
-                    placeholder="Nazwa produktu"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                />
+            <form onSubmit={handleSubmit}>
+                <div className="form-row">
+                    <input
+                        placeholder="Nazwa produktu"
+                        value={name}
+                        onChange={e => setName(e.target.value)}
+                        style={{ flex: 2 }}
+                    />
+                    <input
+                        placeholder="Kategoria"
+                        value={category}
+                        onChange={e => setCategory(e.target.value)}
+                        style={{ flex: 1 }}
+                    />
+                    <input
+                        type="number"
+                        placeholder="Cena (zł)"
+                        value={price}
+                        onChange={e => setPrice(e.target.value)}
+                        style={{ width: '100px' }}
+                    />
+                </div>
 
-                <input
-                    placeholder="Kategoria"
-                    value={category}
-                    onChange={e => setCategory(e.target.value)}
-                />
-
-                <input
-                    type="number"
-                    placeholder="Cena"
-                    value={price}
-                    onChange={e => setPrice(e.target.value)}
-                />
-            </div>
-
-            <button type="submit">{editingProduct ? 'Zapisz zmiany' : 'Dodaj'}</button>
-
-            {editingProduct && (
-                <button type="button" onClick={onCancel}>Anuluj</button>
-            )}
-        </form>
+                <div style={{ marginTop: '10px' }}>
+                    <Button type="submit" style={{ marginRight: '10px' }}>
+                        {editingProduct ? 'Zapisz zmiany' : 'Dodaj'}
+                    </Button>
+                    {editingProduct && (
+                        <Button type="button" variant="secondary" onClick={onCancel}>Anuluj</Button>
+                    )}
+                </div>
+            </form>
+        </div>
     );
 };

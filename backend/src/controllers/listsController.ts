@@ -4,7 +4,36 @@ import { products } from '../data/products';
 import { ShoppingList } from '../types';
 
 export const getLists = (req: Request, res: Response) => {
-    res.json(lists);
+    const { sortBy, order } = req.query;
+    
+    let sortedLists = [...lists];
+
+    if (sortBy === 'name') {
+        sortedLists.sort((a, b) => {
+            return order === 'desc' ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name);
+        });
+    } else if (sortBy === 'date') {
+        sortedLists.sort((a, b) => {
+            return order === 'desc' ? new Date(b.date).getTime() - new Date(a.date).getTime() 
+                                    : new Date(a.date).getTime() - new Date(b.date).getTime();
+        });
+    }
+
+    res.json(sortedLists);
+};
+
+export const updateList = (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+    const { name, date, notes } = req.body;
+    
+    const list = lists.find(l => l.id === id);
+    if (!list) return res.status(404).json({ error: 'Nie znaleziono listy' });
+
+    if (name) list.name = name;
+    if (date) list.date = date;
+    if (notes !== undefined) list.notes = notes;
+
+    res.json(list);
 };
 
 export const addList = (req: Request, res: Response) => {
@@ -52,10 +81,8 @@ export const addProductToList = (req: Request, res: Response) => {
     const existingItem = list.products.find(p => p.id === Number(productId));
 
     if (existingItem) {
-        // SCENARIUSZ A: Produkt jest
         existingItem.quantity += (quantity || 1);
     } else {
-        // SCENARIUSZ B: Produktu nie ma
         const newItem = {
             ...productInDb,
             quantity: quantity || 1, 

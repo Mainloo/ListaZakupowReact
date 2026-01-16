@@ -1,6 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ShoppingList, Product } from '../types';
 import { AddProductToList } from './AddProductToList';
+import { Button } from './common/Button';
 
 interface Props {
     list: ShoppingList;
@@ -23,48 +25,47 @@ export const ListItem: React.FC<Props> = ({
         <div className="list-card">
             <div className="list-header">
                 <h3>{list.name} <span className="date">({list.date})</span></h3>
-                <button onClick={() => onRemove(list.id)}>Usuń listę</button>
+                <div>
+                     <Link to={`/list/${list.id}`}>
+                        <Button variant="secondary" style={{ marginRight: '5px' }}>Edytuj</Button>
+                     </Link>
+                    <Button variant="danger" onClick={() => onRemove(list.id)}>Usuń listę</Button>
+                </div>
             </div>
             
             {list.notes && <p className="notes">{list.notes}</p>}
 
             <ul className="shopping-items">
                 {list.products.map((p, idx) => (
-                    <li 
-                        key={`${p.id}-${idx}`} 
-                        style={{ 
-                            textDecoration: p.isBought ? 'line-through' : 'none',
-                            color: p.isBought ? '#aaa' : 'inherit',
-                            padding: '5px 0', 
-                            display: 'flex', 
-                            justifyContent: 'center',
-                            alignItems: 'center',    
-                            gap: '10px'               
-                        }}
-                    >
-                        <div>
+                    <li key={`${p.id}-${idx}`}>
+                        <div className="product-info">
                             <input 
                                 type="checkbox" 
                                 checked={p.isBought} 
                                 onChange={() => onToggleProduct(list.id, p.id)}
-                                style={{ marginRight: '10px' }}
                             />
-                            {p.name} (x{p.quantity}) - {p.category}
+                            <span style={{ 
+                                textDecoration: p.isBought ? 'line-through' : 'none',
+                                color: p.isBought ? '#aaa' : 'inherit'
+                            }}>
+                                {p.name} (x{p.quantity}) - {p.category}
+                            </span>
                             
                             {p.price && (
-                                <span style={{ fontWeight: 'bold', marginLeft: '5px' }}>
+                                <span className="price-tag">
                                     | {(p.price * p.quantity).toFixed(2)} zł
                                 </span>
                             )}
                         </div>
 
                         <button 
+                            className="remove-btn"
                             onClick={() => onRemoveProduct(list.id, p.id)}
-                            style={{ marginLeft: '10px', color: 'red', cursor: 'pointer' }}
-                        >X</button>
+                            title="Usuń produkt"
+                        >✕</button>
                     </li>
                 ))}
-                {list.products.length === 0 && <li><i>Brak produktów na liście</i></li>}
+                {list.products.length === 0 && <li style={{ justifyContent: 'center', color: '#888' }}><i>Brak produktów na liście</i></li>}
             </ul>
 
             <AddProductToList 

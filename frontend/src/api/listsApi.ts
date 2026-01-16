@@ -1,8 +1,8 @@
 import api from './axios';
 import { ShoppingList, NewListForm } from '../types';
 
-export const fetchLists = async (): Promise<ShoppingList[]> => {
-    const response = await api.get('/lists');
+export const fetchLists = async (sortBy?: string, order?: string): Promise<ShoppingList[]> => {
+    const response = await api.get('/lists', { params: { sortBy, order } });
     return response.data;
 };
 
@@ -13,6 +13,11 @@ export const createList = async (newList: NewListForm): Promise<ShoppingList> =>
 
 export const removeList = async (id: number): Promise<void> => {
     await api.delete(`/lists/${id}`);
+};
+
+export const updateList = async (id: number, listData: Partial<NewListForm>): Promise<ShoppingList> => {
+    const response = await api.put(`/lists/${id}`, listData);
+    return response.data;
 };
 
 export const addProductToList = async (

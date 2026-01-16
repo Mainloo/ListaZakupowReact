@@ -1,5 +1,6 @@
 import React from 'react';
 import { Product } from '../types';
+import { Button } from './common/Button';
 
 interface Props {
     products: Product[];
@@ -9,18 +10,32 @@ interface Props {
 
 export const ProductList: React.FC<Props> = ({ products, onDelete, onEdit }) => {
     if (products.length === 0) {
-        return <p>Brak produktów w bazie</p>;
+        return <p style={{ textAlign: 'center', marginTop: '20px', color: '#666' }}>Brak produktów w bazie</p>;
     }
 
     return (
-        <ul>
-            {products.map(product => (
-                <li key={product.id}>
-                    {product.name} ({product.category}) {product.price && `- ${product.price} zł`}
-                    <button onClick={() => onEdit(product)}>Edytuj</button>
-                    <button onClick={() => onDelete(product.id)}>Usuń</button>
-                </li>
-            ))}
-        </ul>
+        <table className="products-table">
+            <thead>
+                <tr>
+                    <th>Nazwa</th>
+                    <th>Kategoria</th>
+                    <th>Cena</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                {products.map(product => (
+                    <tr key={product.id}>
+                        <td>{product.name}</td>
+                        <td>{product.category}</td>
+                        <td>{product.price ? `${product.price.toFixed(2)} zł` : '-'}</td>
+                        <td style={{ width: '150px' }}>
+                            <Button variant="secondary" onClick={() => onEdit(product)} style={{ marginRight: '5px' }}>Edytuj</Button>
+                            <Button variant="danger" onClick={() => onDelete(product.id)}>Usuń</Button>
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
     );
 };
